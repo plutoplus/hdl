@@ -3,7 +3,7 @@ source ../scripts/adi_env.tcl
 source $ad_hdl_dir/projects/scripts/adi_project_xilinx.tcl
 source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
-set p_device "xc7z010clg225-1"
+set p_device "xc7z010clg400-1"
 adi_project pluto
 
 adi_project_files pluto [list \
