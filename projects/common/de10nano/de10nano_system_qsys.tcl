@@ -15,8 +15,8 @@ set_interface_property sys_rst EXPORT_OF sys_clk.clk_in_reset
 add_instance sys_hps altera_hps
 set_instance_parameter_value sys_hps {MPU_EVENTS_Enable} {0}
 set_instance_parameter_value sys_hps {F2SCLK_SDRAMCLK_Enable} {0}
-set_instance_parameter_value sys_hps {F2SDRAM_Type} {AXI-3 AXI-3}
-set_instance_parameter_value sys_hps {F2SDRAM_Width} {64 64}
+set_instance_parameter_value sys_hps {F2SDRAM_Type} {AXI-3 AXI-3 AXI-3}
+set_instance_parameter_value sys_hps {F2SDRAM_Width} {64 64 64}
 set_instance_parameter_value sys_hps {F2SINTERRUPT_Enable} {1}
 set_instance_parameter_value sys_hps {EMAC0_PinMuxing} {Unused}
 set_instance_parameter_value sys_hps {EMAC0_Mode} {N/A}
@@ -309,6 +309,66 @@ add_connection sys_clk.clk_reset     axi_hdmi_tx_0.s_axi_reset
 add_connection sys_clk.clk_reset     video_dmac.m_src_axi_reset
 add_connection sys_clk.clk_reset     video_dmac.s_axi_reset
 
+# audio
+
+add_instance axi_i2s_adi_0 axi_i2s_adi
+set_instance_parameter_value axi_i2s_adi_0 {BCLK_POL} {0}
+set_instance_parameter_value axi_i2s_adi_0 {HAS_RX} {0}
+set_instance_parameter_value axi_i2s_adi_0 {HAS_TX} {1}
+set_instance_parameter_value axi_i2s_adi_0 {LRCLK_POL} {0}
+set_instance_parameter_value axi_i2s_adi_0 {NUM_OF_CHANNEL} {1}
+set_instance_parameter_value axi_i2s_adi_0 {SLOT_WIDTH} {24}
+set_instance_parameter_value axi_i2s_adi_0 {S_AXI_ADDRESS_WIDTH} {16}
+set_instance_parameter_value axi_i2s_adi_0 {S_AXI_DATA_WIDTH} {32}
+
+add_interface axi_i2s_adi_serial_data conduit end
+set_interface_property axi_i2s_adi_serial_data EXPORT_OF axi_i2s_adi_0.serial_data
+
+add_instance audio_dmac axi_dmac
+set_instance_parameter_value audio_dmac {ASYNC_CLK_DEST_REQ_MANUAL} {1}
+set_instance_parameter_value audio_dmac {ASYNC_CLK_REQ_SRC_MANUAL} {1}
+set_instance_parameter_value audio_dmac {ASYNC_CLK_SRC_DEST_MANUAL} {1}
+set_instance_parameter_value audio_dmac {AUTO_ASYNC_CLK} {1}
+set_instance_parameter_value audio_dmac {AXI_SLICE_DEST} {0}
+set_instance_parameter_value audio_dmac {AXI_SLICE_SRC} {0}
+set_instance_parameter_value audio_dmac {CYCLIC} {1}
+set_instance_parameter_value audio_dmac {DISABLE_DEBUG_REGISTERS} {0}
+set_instance_parameter_value audio_dmac {DMA_2D_TRANSFER} {0}
+set_instance_parameter_value audio_dmac {DMA_AXIS_DEST_W} {4}
+set_instance_parameter_value audio_dmac {DMA_AXIS_ID_W} {8}
+set_instance_parameter_value audio_dmac {DMA_AXI_PROTOCOL_DEST} {1}
+set_instance_parameter_value audio_dmac {DMA_AXI_PROTOCOL_SRC} {1}
+set_instance_parameter_value audio_dmac {DMA_DATA_WIDTH_DEST} {32}
+set_instance_parameter_value audio_dmac {DMA_DATA_WIDTH_SRC} {32}
+set_instance_parameter_value audio_dmac {DMA_LENGTH_WIDTH} {24}
+set_instance_parameter_value audio_dmac {DMA_TYPE_DEST} {1}
+set_instance_parameter_value audio_dmac {DMA_TYPE_SRC} {0}
+set_instance_parameter_value audio_dmac {ENABLE_DIAGNOSTICS_IF} {0}
+set_instance_parameter_value audio_dmac {FIFO_SIZE} {8}
+set_instance_parameter_value audio_dmac {HAS_AXIS_TDEST} {0}
+set_instance_parameter_value audio_dmac {HAS_AXIS_TID} {0}
+set_instance_parameter_value audio_dmac {HAS_AXIS_TKEEP} {0}
+set_instance_parameter_value audio_dmac {HAS_AXIS_TLAST} {1}
+set_instance_parameter_value audio_dmac {HAS_AXIS_TSTRB} {0}
+set_instance_parameter_value audio_dmac {HAS_AXIS_TUSER} {0}
+set_instance_parameter_value audio_dmac {ID} {2}
+set_instance_parameter_value audio_dmac {MAX_BYTES_PER_BURST} {64}
+set_instance_parameter_value audio_dmac {SYNC_TRANSFER_START} {0}
+
+add_connection audio_dmac.m_axis axi_i2s_adi_0.tx_dma_if
+add_connection sys_clk.clk axi_i2s_adi_0.s_axi_clock
+add_connection sys_clk.clk axi_i2s_adi_0.s_axis_aclk
+add_connection sys_clk.clk_reset axi_i2s_adi_0.s_axi_reset
+add_connection sys_clk.clk_reset axi_i2s_adi_0.s_axis_aresetn
+add_connection sys_hps.h2f_user2_clock axi_i2s_adi_0.data_clk_i
+
+add_connection sys_clk.clk sys_hps.f2h_sdram2_clock
+add_connection sys_clk.clk audio_dmac.if_m_axis_aclk
+add_connection sys_clk.clk audio_dmac.m_src_axi_clock
+add_connection sys_clk.clk audio_dmac.s_axi_clock
+add_connection sys_clk.clk_reset audio_dmac.s_axi_reset
+add_connection sys_clk.clk_reset audio_dmac.m_src_axi_reset
+
 # interrupts
 
 ad_cpu_interrupt 0 sys_gpio_bd.irq
@@ -316,6 +376,7 @@ ad_cpu_interrupt 1 sys_spi.irq
 ad_cpu_interrupt 2 sys_gpio_in.irq
 ad_cpu_interrupt 3 ltc2308_spi.irq
 ad_cpu_interrupt 7 video_dmac.interrupt_sender
+ad_cpu_interrupt 8 audio_dmac.interrupt_sender
 
 # cpu interconnects
 
@@ -325,6 +386,8 @@ ad_cpu_interconnect 0x00010080 sys_gpio_bd.s1
 ad_cpu_interconnect 0x00010100 sys_gpio_in.s1
 ad_cpu_interconnect 0x00080000 video_dmac.s_axi
 ad_cpu_interconnect 0x00090000 axi_hdmi_tx_0.s_axi
+ad_cpu_interconnect 0x000A0000 axi_i2s_adi_0.s_axi
+ad_cpu_interconnect 0x000B0000 audio_dmac.s_axi
 ad_cpu_interconnect 0x00100000 pixel_clk_pll_reconfig.mgmt_avalon_slave
 ad_cpu_interconnect 0x00109000 sys_gpio_out.s1
 ad_cpu_interconnect 0x0010A000 ltc2308_spi.spi_control_port
@@ -332,3 +395,4 @@ ad_cpu_interconnect 0x0010A000 ltc2308_spi.spi_control_port
 # dma interconnects
 
 ad_dma_interconnect video_dmac.m_src_axi 0
+ad_dma_interconnect audio_dmac.m_src_axi 2

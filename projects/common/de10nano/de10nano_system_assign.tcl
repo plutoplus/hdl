@@ -580,6 +580,18 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hdmi_data_e
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hdmi_hsync
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hdmi_vsync
 
+# audio
+
+set_location_assignment PIN_T13   -to hdmi_i2s
+set_location_assignment PIN_T11   -to hdmi_lrclk
+set_location_assignment PIN_U11   -to hdmi_mclk
+set_location_assignment PIN_T12   -to hdmi_sclk
+
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hdmi_i2s
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hdmi_lrclk
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hdmi_mclk
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hdmi_sclk
+
 # globals
 
 set_global_assignment -name USE_DLL_FREQUENCY_FOR_DQS_DELAY_CHAIN ON

@@ -109,13 +109,12 @@ module system_top (
   output  [ 23:0]   hdmi_data,
 
   inout             hdmi_i2c_scl,
-  inout             hdmi_i2c_sda
+  inout             hdmi_i2c_sda,
 
-  // hdmi_i2s
-  // hdmi_lrclk
-  // hdmi_mclk
-  // hdmi_sclk
-
+  output            hdmi_i2s,
+  output            hdmi_lrclk,
+  output            hdmi_mclk,
+  output            hdmi_sclk
   );
 
   // internal signals
@@ -124,12 +123,16 @@ module system_top (
   wire    [63:0]   gpio_i;
   wire    [63:0]   gpio_o;
 
+  wire             bclk;
   wire             i2c0_out_data;
   wire             i2c0_sda;
   wire             i2c0_out_clk;
   wire             i2c0_scl_in_clk;
 
   // instantiations
+
+  assign hdmi_mclk = bclk;
+  assign hdmi_sclk = bclk;
 
   assign gpio_i[63:14] = gpio_o[63:14];
 
@@ -214,6 +217,10 @@ module system_top (
     .sys_gpio_bd_out_port (gpio_o[31:0]),
     .sys_gpio_in_export (gpio_i[63:32]),
     .sys_gpio_out_export (gpio_o[63:32]),
+    .axi_i2s_adi_serial_data_bclk_o (bclk),
+    .axi_i2s_adi_serial_data_lrclk_o (hdmi_lrclk),
+    .axi_i2s_adi_serial_data_sdata_o (hdmi_i2s),
+    .axi_i2s_adi_serial_data_sdata_i (1'b0),
     .axi_hdmi_tx_0_hdmi_if_h_clk (hdmi_out_clk),
     .axi_hdmi_tx_0_hdmi_if_h24_hsync (hdmi_hsync),
     .axi_hdmi_tx_0_hdmi_if_h24_vsync (hdmi_vsync),
